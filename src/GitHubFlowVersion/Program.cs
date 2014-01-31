@@ -64,11 +64,11 @@ namespace GitHubFlowVersion
             {
                 Arguments = arguments,
                 WorkingDirectory =
-                    arguments.WorkingDirectory ?? 
+                    arguments.WorkingDirectory ??
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
             };
             var fallbackStrategy = new LocalBuild();
-            var buildServers = new IBuildServer[] {new TeamCity(context)};
+            var buildServers = new IBuildServer[] { new TeamCity(context) };
             context.CurrentBuildServer = buildServers.FirstOrDefault(s => s.IsRunningInBuildAgent()) ?? fallbackStrategy;
 
             context.GitDirectory = GitDirFinder.TreeWalkForGitDir(context.WorkingDirectory);
@@ -124,8 +124,9 @@ namespace GitHubFlowVersion
         {
             var gitHelper = new GitHelper();
             var gitRepo = new Repository(context.GitDirectory);
-            var lastTaggedReleaseFinder = new LastTaggedReleaseFinder(gitRepo, gitHelper, context.WorkingDirectory);
-            var nextSemverCalculator = new NextSemverCalculator(new NextVersionTxtFileFinder(context.RepositoryRoot),
+            var lastTaggedReleaseFinder = new GusFlowReleaseFinder(gitRepo, gitHelper, context.WorkingDirectory);
+            var nextSemverCalculator = new GusFlowNextSemverCalculator(
+                new NextVersionTxtFileFinder(context.RepositoryRoot),
                 lastTaggedReleaseFinder);
             var buildNumberCalculator = new BuildNumberCalculator(nextSemverCalculator, lastTaggedReleaseFinder, gitHelper,
                 gitRepo, context.CurrentBuildServer);
@@ -133,7 +134,7 @@ namespace GitHubFlowVersion
             context.NextBuildNumber = buildNumberCalculator.GetBuildNumber();
 
             var variableProvider = new VariableProvider();
-            context.Variables =  variableProvider.GetVariables(context.NextBuildNumber);
+            context.Variables = variableProvider.GetVariables(context.NextBuildNumber);
             WriteResults(context);
         }
 

@@ -22,5 +22,15 @@ namespace GitHubFlowVersion
         {
             get { return _semVer; }
         }
+
+        public static VersionTaggedCommit Create(Commit commit, string semVer)
+        {
+            SemanticVersion version;
+            if (SemanticVersionParser.TryParse(semVer, out version))
+            {
+                return new VersionTaggedCommit(commit, version);
+            }
+            return null;
+        }
     }
 }

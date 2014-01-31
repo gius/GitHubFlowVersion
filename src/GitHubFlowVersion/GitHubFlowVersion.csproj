@@ -55,8 +55,10 @@
     <Compile Include="BuildNumberCalculator.cs" />
     <Compile Include="BuildServers\IBuildServer.cs" />
     <Compile Include="BuildServers\LocalBuild.cs" />
+    <Compile Include="GusFlowNextSemverCalculator.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="GitHubFlowVersionContext.cs" />
+    <Compile Include="GusFlowReleaseFinder.cs" />
     <Compile Include="IFileSystem.cs" />
     <Compile Include="ProcessHelper.cs" />
     <Compile Include="GitHubFlowArguments.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="NextSemverCalculator.cs" />
     <Compile Include="NextVersionTxtFileFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RepositoryExtensions.cs" />
     <Compile Include="SemanticVersion.cs" />
     <Compile Include="SemanticVersionParser.cs" />
     <Compile Include="BuildServers\TeamCity.cs" />

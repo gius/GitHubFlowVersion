@@ -2,7 +2,7 @@
 
 namespace GitHubFlowVersion
 {
-    public class SemanticVersion
+    public class SemanticVersion : IComparable
     {
         public SemanticVersion(int major, int minor, int patch, string suffix = null, int? buildMetaData = null)
         {
@@ -23,7 +23,7 @@ namespace GitHubFlowVersion
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((SemanticVersion) obj);
+            return Equals((SemanticVersion)obj);
         }
 
         public override int GetHashCode()
@@ -31,9 +31,9 @@ namespace GitHubFlowVersion
             unchecked
             {
                 int hashCode = Major;
-                hashCode = (hashCode*397) ^ Minor;
-                hashCode = (hashCode*397) ^ Patch;
-                hashCode = (hashCode*397) ^ (Suffix != null ? Suffix.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Minor;
+                hashCode = (hashCode * 397) ^ Patch;
+                hashCode = (hashCode * 397) ^ (Suffix != null ? Suffix.GetHashCode() : 0);
                 return hashCode;
             }
         }
@@ -113,6 +113,11 @@ namespace GitHubFlowVersion
             return -1;
         }
 
+        int IComparable.CompareTo(object obj)
+        {
+            return CompareTo(obj as SemanticVersion);
+        }
+
         public int Major { get; private set; }
         public int Minor { get; private set; }
         public int Patch { get; private set; }
@@ -122,8 +127,8 @@ namespace GitHubFlowVersion
         public override string ToString()
         {
             return string.Format(
-                "{0}.{1}.{2}{3}{4}", 
-                Major, Minor, Patch, 
+                "{0}.{1}.{2}{3}{4}",
+                Major, Minor, Patch,
                 string.IsNullOrEmpty(Suffix) ? null : "-" + Suffix,
                 BuildMetaData == null ? null : "+" + BuildMetaData.Value.ToString("000"));
         }

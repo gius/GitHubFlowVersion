@@ -8,9 +8,9 @@ namespace GitHubFlowVersion
     {
         public int NumberOfCommitsOnBranchSinceCommit(Branch branch, Commit commit)
         {
-            var olderThan = branch.Tip.Committer.When;
+            var olderThan = commit.Committer.When;
             return branch.Commits
-                .TakeWhile(x => x != commit)
+                .TakeWhile(x => x.Committer.When > olderThan)
                 .Count();
         }
 
@@ -86,7 +86,7 @@ namespace GitHubFlowVersion
             CreateFakeBranchPointingAtThePullRequestTip(repository);
         }
 
-        static void EnsureOnlyOneRemoteIsDefined(IRepository repo)
+        private static void EnsureOnlyOneRemoteIsDefined(IRepository repo)
         {
             var howMany = repo.Network.Remotes.Count();
 
@@ -99,7 +99,7 @@ namespace GitHubFlowVersion
             throw new Exception(message);
         }
 
-        static void CreateMissingLocalBranchesFromRemoteTrackingOnes(IRepository repo)
+        private static void CreateMissingLocalBranchesFromRemoteTrackingOnes(IRepository repo)
         {
             var remoteName = repo.Network.Remotes.Single().Name;
             var prefix = string.Format("refs/remotes/{0}/", remoteName);
@@ -122,7 +122,7 @@ namespace GitHubFlowVersion
             }
         }
 
-        static void CreateFakeBranchPointingAtThePullRequestTip(IRepository repo)
+        private static void CreateFakeBranchPointingAtThePullRequestTip(IRepository repo)
         {
             var remote = repo.Network.Remotes.Single();
             var remoteTips = repo.Network.ListReferences(remote);
