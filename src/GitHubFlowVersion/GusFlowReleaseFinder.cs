@@ -45,7 +45,7 @@ namespace GitHubFlowVersion
             }
             else if (branchName.StartsWith("feature/"))
             {
-                suffix = branchName.Split('/').Last();
+                suffix = branchName.Replace("feature/", "alpha/");
                 var release = GetLatestReleaseBeforeDate(gitRepo, gitHelper, commitTime);
                 if (release != null)
                 {
