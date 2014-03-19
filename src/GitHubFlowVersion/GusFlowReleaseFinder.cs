@@ -60,7 +60,7 @@ namespace GitHubFlowVersion
                 SemanticVersion version;
                 if (SemanticVersionParser.TryParse(releaseVersion, out version))
                 {
-                    var branchStart = FindFirstCommitNotInBranch(head.Commits, gitHelper.GetBranch(gitRepo, "develop"));
+                    var branchStart = FindFirstCommitNotInBranch(head.Commits, gitHelper.GetBranch(gitRepo, "develop")) ?? head.Tip;
                     result = new VersionTaggedCommit(branchStart, version.WithSuffix(suffix));
                 }
             }
@@ -72,7 +72,7 @@ namespace GitHubFlowVersion
                 SemanticVersion version;
                 if (SemanticVersionParser.TryParse(releaseVersion, out version))
                 {
-                    var branchStart = FindFirstCommitNotInBranch(head.Commits, gitHelper.GetBranch(gitRepo, "master"));
+                    var branchStart = FindFirstCommitNotInBranch(head.Commits, gitHelper.GetBranch(gitRepo, "master")) ?? head.Tip;
                     result = new VersionTaggedCommit(branchStart, version.WithSuffix(suffix));
                 }
             }
@@ -124,7 +124,7 @@ namespace GitHubFlowVersion
 
         private Commit FindFirstCommitNotInBranch(IEnumerable<Commit> commits, Branch branch)
         {
-            return commits.TakeWhile(x => !branch.Commits.Contains(x)).Last();
+            return commits.TakeWhile(x => !branch.Commits.Contains(x)).LastOrDefault();
         }
     }
 }
