@@ -60,7 +60,8 @@ namespace GitHubFlowVersion
                 SemanticVersion version;
                 if (SemanticVersionParser.TryParse(releaseVersion, out version))
                 {
-                    var branchStart = FindFirstCommitNotInBranch(head.Commits, gitHelper.GetBranch(gitRepo, "develop")) ?? head.Tip;
+                    // when in Release, the first commit that is shared for both Develop and Release should be considered as the Release branch start
+                    var branchStart = FindFirstCommitSharedWithBranch(head.Commits, gitHelper.GetBranch(gitRepo, "develop")) ?? head.Tip;
                     result = new VersionTaggedCommit(branchStart, version.WithSuffix(suffix));
                 }
             }
@@ -97,10 +98,9 @@ namespace GitHubFlowVersion
             var develop = gitHelper.GetBranch(gitRepo, "develop");
             var releaseBranches = from b in gitRepo.Branches
                                   where b.Name.StartsWith("release/")
-                                  let latestCommitBeforeDate = b.Commits.FirstOrDefault(c => c.Committer.When < date)
-                                  where latestCommitBeforeDate != null
-                                  where !develop.Commits.Contains(latestCommitBeforeDate)
-                                  let taggedCommit = VersionTaggedCommit.Create(latestCommitBeforeDate, b.Name.Split('/').Last())
+                                  let branchStartCommit = FindFirstCommitSharedWithBranch(b.Commits, develop) ?? b.Tip
+                                  where branchStartCommit.Committer.When < date
+                                  let taggedCommit = VersionTaggedCommit.Create(branchStartCommit, b.Name.Split('/').Last())
                                   where taggedCommit != null
                                   orderby taggedCommit.SemVer descending
                                   select taggedCommit;
@@ -125,6 +125,20 @@ namespace GitHubFlowVersion
         private Commit FindFirstCommitNotInBranch(IEnumerable<Commit> commits, Branch branch)
         {
             return commits.TakeWhile(x => !branch.Commits.Contains(x)).LastOrDefault();
+        }
+
+        private Commit FindFirstCommitSharedWithBranch(IEnumerable<Commit> commits, Branch branch)
+        {
+            var firstCommitNotInBranch = FindFirstCommitNotInBranch(commits, branch);
+
+            if (firstCommitNotInBranch != null && firstCommitNotInBranch.Parents.FirstOrDefault() != null)
+            {
+                return firstCommitNotInBranch.Parents.First();
+            }
+            else
+            {
+                return firstCommitNotInBranch;
+            }
         }
     }
 }
