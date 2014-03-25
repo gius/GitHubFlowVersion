@@ -1,0 +1,1 @@
+D:\Dev\Tools\GitHubFlowVersion\GitHubFlowVersion.exe /W . /U /Exec PublishCustomNuget-Internal.cmd
