@@ -15,7 +15,7 @@ namespace GitHubFlowVersion
         public BuildNumberCalculator(
             INextSemverCalculator nextSemverCalculator,
             ILastTaggedReleaseFinder lastTaggedReleaseFinder,
-            IGitHelper gitHelper, IRepository gitRepo, 
+            IGitHelper gitHelper, IRepository gitRepo,
             IBuildServer buildServer)
         {
             _nextSemverCalculator = nextSemverCalculator;
@@ -34,7 +34,7 @@ namespace GitHubFlowVersion
                 _gitHelper.EnsurePullBranchShareACommonAncestorWithMaster(_gitRepo, _gitRepo.Head);
                 semanticVersion = semanticVersion.WithSuffix("PullRequest" + _buildServer.CurrentPullRequestNo(_gitRepo.Head));
             }
-            var withBuildMetaData = semanticVersion.WithBuildMetaData(commitsSinceLastRelease);
+            var withBuildMetaData = commitsSinceLastRelease > 0 ? semanticVersion.WithBuildMetaData(commitsSinceLastRelease) : semanticVersion;
             Console.WriteLine("Version number is '{0}'", withBuildMetaData);
             return withBuildMetaData;
         }
